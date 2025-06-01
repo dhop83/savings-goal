@@ -830,13 +830,15 @@
             "The race is heating up! Who will reach the goal first?",
             "Every month counts in this savings race!",
             "Notice how the 'free money' from interest keeps growing!",
-            "This is why financial advisors say to start early and stay consistent!",
+           "This is why financial advisors say to start early and stay consistent!",
 "The finish line is in sight. Who's going to win this savings showdown?"
 ];
 
-// Additional functionality (e.g., button actions, race simulation) should be implemented below.
+let earlySaved = 0, lateSaved = 0;
+let earlyInterest = 0, lateInterest = 0;
+let year = 0;
 
-// Placeholder example to hook up tutorial explanation logic:
+// Hook up tutorial buttons
 document.querySelectorAll('.tutorial-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tutorialKey = btn.getAttribute('data-tutorial');
@@ -844,7 +846,6 @@ document.querySelectorAll('.tutorial-btn').forEach(btn => {
       document.getElementById('tutorialExplanation').textContent = `${tutorials[tutorialKey].title}: ${tutorials[tutorialKey].explanation}`;
       currentTutorial = tutorialKey;
 
-      // Set default racer settings based on tutorial preset
       document.getElementById('earlyAge').value = tutorials[tutorialKey].settings.early.age;
       document.getElementById('earlyAmount').value = tutorials[tutorialKey].settings.early.amount;
       earlyRate = tutorials[tutorialKey].settings.early.rate;
@@ -852,27 +853,99 @@ document.querySelectorAll('.tutorial-btn').forEach(btn => {
       document.getElementById('lateAge').value = tutorials[tutorialKey].settings.late.age;
       document.getElementById('lateAmount').value = tutorials[tutorialKey].settings.late.amount;
       lateRate = tutorials[tutorialKey].settings.late.rate;
-
-      // Reset race visuals here if needed
     }
   });
 });
 
-// Example Start/Reset button functionality
-document.getElementById('startRace').addEventListener('click', () => {
+// Custom Goal Setting
+const customBtn = document.getElementById('setCustomGoal');
+if (customBtn) {
+  customBtn.addEventListener('click', () => {
+    const amount = parseFloat(document.getElementById('customAmount').value);
+    if (!isNaN(amount) && amount > 0) {
+      currentGoal = amount;
+      currentGoalName = "Custom Goal";
+      alert(`Your goal is set to $${amount.toLocaleString()}`);
+    }
+  });
+}
+
+// Start Race
+const startBtn = document.getElementById('startRace');
+startBtn.addEventListener('click', () => {
+  if (raceInProgress) return;
   document.getElementById('liveCommentary').textContent = commentary[Math.floor(Math.random() * commentary.length)];
-  // Start simulation logic goes here
+  raceInProgress = true;
+
+  earlySaved = 0; lateSaved = 0;
+  earlyInterest = 0; lateInterest = 0;
+  year = 0;
+
+  raceInterval = setInterval(() => {
+    year++;
+
+    const earlyMonthly = parseFloat(document.getElementById('earlyAmount').value);
+    const lateMonthly = parseFloat(document.getElementById('lateAmount').value);
+
+    earlySaved += earlyMonthly * 12;
+    earlyInterest = earlySaved * (earlyRate / 100);
+    const earlyTotal = earlySaved + earlyInterest;
+    const earlyPct = Math.min(100, (earlyTotal / currentGoal) * 100);
+
+    document.getElementById('earlyProgress').style.width = earlyPct + '%';
+    document.getElementById('earlyStats').textContent = `Age: ${parseInt(document.getElementById('earlyAge').value) + year} | Saved: $${earlyTotal.toFixed(0)} | Years: ${year}`;
+    document.getElementById('earlyContributionsAmount').textContent = earlySaved.toFixed(0);
+    document.getElementById('earlyInterestAmount').textContent = earlyInterest.toFixed(0);
+    document.getElementById('earlyContributionsFill').style.width = (earlySaved / earlyTotal * 100) + '%';
+    document.getElementById('earlyInterestFill').style.width = (earlyInterest / earlyTotal * 100) + '%';
+
+    lateSaved += lateMonthly * 12;
+    lateInterest = lateSaved * (lateRate / 100);
+    const lateTotal = lateSaved + lateInterest;
+    const latePct = Math.min(100, (lateTotal / currentGoal) * 100);
+
+    document.getElementById('lateProgress').style.width = latePct + '%';
+    document.getElementById('lateStats').textContent = `Age: ${parseInt(document.getElementById('lateAge').value) + year} | Saved: $${lateTotal.toFixed(0)} | Years: ${year}`;
+    document.getElementById('lateContributionsAmount').textContent = lateSaved.toFixed(0);
+    document.getElementById('lateInterestAmount').textContent = lateInterest.toFixed(0);
+    document.getElementById('lateContributionsFill').style.width = (lateSaved / lateTotal * 100) + '%';
+    document.getElementById('lateInterestFill').style.width = (lateInterest / lateTotal * 100) + '%';
+
+    if (earlyTotal >= currentGoal || lateTotal >= currentGoal) {
+      clearInterval(raceInterval);
+      document.getElementById('winnerAnnouncement').classList.add('show');
+      document.getElementById('winnerText').textContent =
+        earlyTotal > lateTotal ? '🐢 The Early Bird Wins!' : '🐰 The Late Starter Wins!';
+      raceInProgress = false;
+    }
+  }, 1000);
 });
 
-document.getElementById('resetRace').addEventListener('click', () => {
-  document.getElementById('liveCommentary').textContent = "Ready to race! Click \"Start the Race!\" to see who wins.";
+// Reset Race
+const resetBtn = document.getElementById('resetRace');
+resetBtn.addEventListener('click', () => {
+  clearInterval(raceInterval);
+  raceInProgress = false;
+  year = 0;
+  earlySaved = 0; lateSaved = 0;
+  earlyInterest = 0; lateInterest = 0;
+
+  document.getElementById('earlyProgress').style.width = '0%';
+  document.getElementById('lateProgress').style.width = '0%';
+  document.getElementById('earlyStats').textContent = `Age: ${document.getElementById('earlyAge').value} | Saved: $0 | Years: 0`;
+  document.getElementById('lateStats').textContent = `Age: ${document.getElementById('lateAge').value} | Saved: $0 | Years: 0`;
+  document.getElementById('earlyContributionsAmount').textContent = '0';
+  document.getElementById('earlyInterestAmount').textContent = '0';
+  document.getElementById('lateContributionsAmount').textContent = '0';
+  document.getElementById('lateInterestAmount').textContent = '0';
+  document.getElementById('earlyContributionsFill').style.width = '50%';
+  document.getElementById('earlyInterestFill').style.width = '50%';
+  document.getElementById('lateContributionsFill').style.width = '50%';
+  document.getElementById('lateInterestFill').style.width = '50%';
   document.getElementById('winnerAnnouncement').classList.remove('show');
-  // Reset visual bars and stats to initial states
+  document.getElementById('liveCommentary').textContent = "Ready to race! Click \"Start the Race!\" to see who wins.";
 });
 
-// You can expand with a simulation loop, progress logic, and breakdown updates below
-// For example: increment savings month by month until one reaches the goal
-
-    </script>
+</script>
 </body>
 </html>
