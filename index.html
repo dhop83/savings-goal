@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Goals Race Simulator</title>
+    <title>Enhanced Savings Goals Race Simulator</title>
     <style>
         * {
             margin: 0;
@@ -43,6 +43,45 @@
         .header p {
             font-size: 1.3em;
             opacity: 0.9;
+        }
+        
+        .tutorial-mode {
+            background: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #45a049;
+        }
+        
+        .tutorial-controls {
+            margin-top: 15px;
+        }
+        
+        .tutorial-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .tutorial-btn:hover, .tutorial-btn.active {
+            background: white;
+            color: #4CAF50;
+        }
+        
+        .tutorial-explanation {
+            background: #e8f5e8;
+            border-left: 5px solid #4CAF50;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            line-height: 1.6;
         }
         
         .goal-selector {
@@ -144,6 +183,7 @@
             display: flex;
             gap: 20px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .control-group {
@@ -168,8 +208,26 @@
             font-weight: bold;
         }
         
-        .control-input::placeholder {
-            color: rgba(255,255,255,0.7);
+        .rate-selector {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .rate-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s;
+        }
+        
+        .rate-btn:hover, .rate-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: white;
         }
         
         .race-track {
@@ -202,9 +260,9 @@
         }
         
         .progress-bar {
-            height: 50px;
+            height: 60px;
             background: #e9ecef;
-            border-radius: 25px;
+            border-radius: 30px;
             position: relative;
             overflow: hidden;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
@@ -212,7 +270,7 @@
         
         .progress-fill {
             height: 100%;
-            border-radius: 25px;
+            border-radius: 30px;
             transition: width 2s ease;
             position: relative;
             display: flex;
@@ -253,6 +311,78 @@
             );
         }
         
+        .breakdown-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .breakdown-chart {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .breakdown-chart h4 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .breakdown-bar {
+            height: 40px;
+            border-radius: 20px;
+            background: #e9ecef;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .contributions-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            float: left;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .interest-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            float: left;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .breakdown-legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
         .controls-panel {
             text-align: center;
             margin: 30px 0;
@@ -281,6 +411,22 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+        
+        .live-commentary {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #856404;
+            text-align: center;
         }
         
         .winner-announcement {
@@ -342,6 +488,36 @@
             font-size: 1.2em;
         }
         
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
         @media (max-width: 768px) {
             .racer-header {
                 flex-direction: column;
@@ -356,14 +532,33 @@
             .header h1 {
                 font-size: 2.2em;
             }
+            
+            .breakdown-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏁 Savings Goals Race Simulator</h1>
+            <h1>🏁 Enhanced Savings Goals Race Simulator</h1>
             <p>Watch different saving strategies race to reach your financial goals!</p>
+        </div>
+        
+        <div class="tutorial-mode">
+            <h3>🎓 Learning Mode</h3>
+            <p>Choose a guided tutorial to learn key savings concepts:</p>
+            <div class="tutorial-controls">
+                <button class="tutorial-btn" data-tutorial="basic">Basic Race</button>
+                <button class="tutorial-btn" data-tutorial="early-wins">Why Early Wins</button>
+                <button class="tutorial-btn" data-tutorial="interest-power">Interest Rate Power</button>
+                <button class="tutorial-btn" data-tutorial="catch-up">Can Late Starter Win?</button>
+            </div>
+        </div>
+        
+        <div class="tutorial-explanation" id="tutorialExplanation">
+            Click a tutorial above to get started, or scroll down to create your own race scenarios!
         </div>
         
         <div class="goal-selector">
@@ -395,7 +590,13 @@
         <div class="racers-section">
             <div class="racer">
                 <div class="racer-header">
-                    <div class="racer-name">🐢 The Early Bird</div>
+                    <div class="racer-name">
+                        🐢 The Early Bird
+                        <div class="tooltip">
+                            ℹ️
+                            <span class="tooltiptext">The Early Bird starts young with smaller amounts but has time on their side. Time allows compound interest to work its magic!</span>
+                        </div>
+                    </div>
                     <div class="racer-controls">
                         <div class="control-group">
                             <label>Starting Age</label>
@@ -406,8 +607,13 @@
                             <input type="number" class="control-input" id="earlyAmount" value="100" min="25" max="1000">
                         </div>
                         <div class="control-group">
-                            <label>Interest Rate %</label>
-                            <input type="number" class="control-input" id="earlyRate" value="7" min="1" max="15" step="0.5">
+                            <label>Investment Style</label>
+                            <div class="rate-selector" id="earlyRateSelector">
+                                <button class="rate-btn" data-rate="2.5">Conservative<br>2.5%</button>
+                                <button class="rate-btn active" data-rate="6">Balanced<br>6%</button>
+                                <button class="rate-btn" data-rate="9">Growth<br>9%</button>
+                            </div>
+                            <input type="hidden" id="earlyRate" value="6">
                         </div>
                     </div>
                 </div>
@@ -429,7 +635,13 @@
             
             <div class="racer">
                 <div class="racer-header">
-                    <div class="racer-name">🐰 The Late Starter</div>
+                    <div class="racer-name">
+                        🐰 The Late Starter
+                        <div class="tooltip">
+                            ℹ️
+                            <span class="tooltiptext">The Late Starter begins later but tries to catch up with larger monthly contributions. Can they overcome the time disadvantage?</span>
+                        </div>
+                    </div>
                     <div class="racer-controls">
                         <div class="control-group">
                             <label>Starting Age</label>
@@ -440,8 +652,13 @@
                             <input type="number" class="control-input" id="lateAmount" value="300" min="50" max="2000">
                         </div>
                         <div class="control-group">
-                            <label>Interest Rate %</label>
-                            <input type="number" class="control-input" id="lateRate" value="7" min="1" max="15" step="0.5">
+                            <label>Investment Style</label>
+                            <div class="rate-selector" id="lateRateSelector">
+                                <button class="rate-btn" data-rate="2.5">Conservative<br>2.5%</button>
+                                <button class="rate-btn active" data-rate="6">Balanced<br>6%</button>
+                                <button class="rate-btn" data-rate="9">Growth<br>9%</button>
+                            </div>
+                            <input type="hidden" id="lateRate" value="6">
                         </div>
                     </div>
                 </div>
@@ -462,9 +679,51 @@
             </div>
         </div>
         
+        <div class="breakdown-container">
+            <div class="breakdown-chart">
+                <h4>🐢 Early Bird Money Breakdown</h4>
+                <div class="breakdown-bar">
+                    <div class="contributions-fill" id="earlyContributionsFill" style="width: 50%;">Contributions</div>
+                    <div class="interest-fill" id="earlyInterestFill" style="width: 50%;">Interest</div>
+                </div>
+                <div class="breakdown-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                        <span>Your Money: $<span id="earlyContributionsAmount">0</span></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #4CAF50, #45a049);"></div>
+                        <span>Free Interest: $<span id="earlyInterestAmount">0</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="breakdown-chart">
+                <h4>🐰 Late Starter Money Breakdown</h4>
+                <div class="breakdown-bar">
+                    <div class="contributions-fill" id="lateContributionsFill" style="width: 50%;">Contributions</div>
+                    <div class="interest-fill" id="lateInterestFill" style="width: 50%;">Interest</div>
+                </div>
+                <div class="breakdown-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                        <span>Your Money: $<span id="lateContributionsAmount">0</span></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #4CAF50, #45a049);"></div>
+                        <span>Free Interest: $<span id="lateInterestAmount">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="controls-panel">
             <button class="race-btn" id="startRace">🏁 Start the Race!</button>
             <button class="race-btn" id="resetRace">🔄 Reset Race</button>
+        </div>
+        
+        <div class="live-commentary" id="liveCommentary">
+            Ready to race! Click "Start the Race!" to see who wins.
         </div>
         
         <div class="winner-announcement" id="winnerAnnouncement">
@@ -480,12 +739,16 @@
                     <p>Starting early, even with small amounts, often beats starting late with larger amounts. Compound interest needs time to work its magic!</p>
                 </div>
                 <div class="insight-card">
+                    <h4>Investment Style Matters</h4>
+                    <p>Conservative investments (2-3%) are safer but grow slower. Growth investments (8-10%) have more risk but can dramatically accelerate your timeline.</p>
+                </div>
+                <div class="insight-card">
                     <h4>Consistency Wins</h4>
                     <p>Regular monthly contributions, no matter how small, add up over time. The "slow and steady" approach often wins the race.</p>
                 </div>
                 <div class="insight-card">
-                    <h4>Every Dollar Counts</h4>
-                    <p>Even increasing your monthly savings by $25-50 can dramatically change when you reach your goal. Small changes make big differences!</p>
+                    <h4>Free Money from Interest</h4>
+                    <p>The breakdown charts show how much money comes from your contributions vs. "free" money from compound interest. More time = more free money!</p>
                 </div>
             </div>
         </div>
@@ -496,169 +759,69 @@
         let currentGoalName = "Emergency Fund";
         let raceInProgress = false;
         let raceInterval;
+        let currentTutorial = null;
         
-        // Goal selection
-        document.querySelectorAll('.goal-btn').forEach(btn => {
+        const tutorials = {
+            basic: {
+                title: "Basic Race Tutorial",
+                explanation: "This is a simple race between two savers. The Early Bird starts at 18 with $100/month, the Late Starter begins at 30 with $300/month. Both use balanced investing (6% return). Watch to see who wins!",
+                settings: {
+                    early: { age: 18, amount: 100, rate: 6 },
+                    late: { age: 30, amount: 300, rate: 6 }
+                }
+            },
+            "early-wins": {
+                title: "Why Starting Early Usually Wins",
+                explanation: "This tutorial shows the power of TIME in investing. The Early Bird saves less per month ($100 vs $400) but starts 12 years earlier. Watch how compound interest makes the difference! Notice how much 'free money' each saver gets from interest.",
+                settings: {
+                    early: { age: 18, amount: 100, rate: 7 },
+                    late: { age: 30, amount: 400, rate: 7 }
+                }
+            },
+            "interest-power": {
+                title: "The Power of Interest Rates",
+                explanation: "Both savers start at the same age and save the same amount, but one chooses growth investing (9%) while the other stays conservative (2.5%). See how investment choice dramatically affects your timeline!",
+                settings: {
+                    early: { age: 25, amount: 200, rate: 2.5 },
+                    late: { age: 25, amount: 200, rate: 9 }
+                }
+            },
+            "catch-up": {
+                title: "Can the Late Starter Ever Win?",
+                explanation: "Challenge: Can you make the Late Starter win? Try increasing their monthly savings or choosing a more aggressive investment style. This shows that while starting early is best, it's never too late to start saving!",
+                settings: {
+                    early: { age: 18, amount: 100, rate: 6 },
+                    late: { age: 35, amount: 200, rate: 6 }
+                }
+            }
+        };
+        
+        const commentary = [
+            "And they're off! Both savers are starting their journey.",
+            "The Early Bird is building momentum with compound interest!",
+            "The Late Starter is putting in more money each month to catch up.",
+            "Look at those interest earnings growing!",
+            "Time is showing its power - compound interest is accelerating!",
+            "The race is heating up! Who will reach the goal first?",
+            "Every month counts in this savings race!",
+            "Notice how the 'free money' from interest keeps growing!",
+            "This is why financial advisors say 'start early'!",
+            "The finish line is in sight! Who will win?"
+        ];
+        
+        let commentaryIndex = 0;
+        
+        // Tutorial system
+        document.querySelectorAll('.tutorial-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Update active button
-                document.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tutorial-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
-                // Handle custom goal
-                const customGoal = document.getElementById('customGoal');
-                if (btn.dataset.goal === 'custom') {
-                    customGoal.classList.add('active');
-                } else {
-                    customGoal.classList.remove('active');
-                    currentGoal = parseInt(btn.dataset.goal);
-                    currentGoalName = btn.dataset.name;
-                }
+                const tutorialKey = btn.dataset.tutorial;
+                currentTutorial = tutorials[tutorialKey];
                 
-                resetRace();
-            });
-        });
-        
-        // Custom goal input
-        document.getElementById('customAmount').addEventListener('input', (e) => {
-            currentGoal = parseInt(e.target.value) || 50000;
-            currentGoalName = `Custom Goal ($${currentGoal.toLocaleString()})`;
-            resetRace();
-        });
-        
-        // Calculate savings growth
-        function calculateSavings(startAge, monthlyAmount, interestRate, maxYears = 50) {
-            const monthlyRate = interestRate / 100 / 12;
-            let balance = 0;
-            let months = 0;
-            
-            while (balance < currentGoal && months < maxYears * 12) {
-                balance = balance * (1 + monthlyRate) + monthlyAmount;
-                months++;
+                document.getElementById('tutorialExplanation').innerHTML = 
+                    `<strong>${currentTutorial.title}</strong><br><br>${currentTutorial.explanation}`;
                 
-                if (balance >= currentGoal) {
-                    return {
-                        months: months,
-                        years: Math.round(months / 12 * 10) / 10,
-                        finalAge: startAge + Math.round(months / 12),
-                        finalBalance: Math.round(balance)
-                    };
-                }
-            }
-            
-            return {
-                months: months,
-                years: Math.round(months / 12 * 10) / 10,
-                finalAge: startAge + Math.round(months / 12),
-                finalBalance: Math.round(balance),
-                reachedGoal: false
-            };
-        }
-        
-        // Start race animation
-        function startRace() {
-            if (raceInProgress) return;
-            
-            raceInProgress = true;
-            document.getElementById('startRace').disabled = true;
-            document.getElementById('winnerAnnouncement').classList.remove('show');
-            
-            // Get values
-            const earlyAge = parseInt(document.getElementById('earlyAge').value);
-            const earlyAmount = parseInt(document.getElementById('earlyAmount').value);
-            const earlyRate = parseFloat(document.getElementById('earlyRate').value);
-            
-            const lateAge = parseInt(document.getElementById('lateAge').value);
-            const lateAmount = parseInt(document.getElementById('lateAmount').value);
-            const lateRate = parseFloat(document.getElementById('lateRate').value);
-            
-            // Calculate results
-            const earlyResult = calculateSavings(earlyAge, earlyAmount, earlyRate);
-            const lateResult = calculateSavings(lateAge, lateAmount, lateRate);
-            
-            // Determine winner and race duration
-            const maxTime = Math.max(earlyResult.years, lateResult.years) || 30;
-            const raceDuration = 5000; // 5 seconds for the race animation
-            
-            let startTime = Date.now();
-            
-            raceInterval = setInterval(() => {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / raceDuration, 1);
-                
-                // Update early bird
-                const earlyCurrentYear = progress * earlyResult.years;
-                const earlyCurrentBalance = (earlyCurrentYear / earlyResult.years) * Math.min(earlyResult.finalBalance, currentGoal);
-                const earlyProgressPercent = Math.min((earlyCurrentBalance / currentGoal) * 100, 100);
-                
-                document.getElementById('earlyProgress').style.width = earlyProgressPercent + '%';
-                document.getElementById('earlyStats').textContent = 
-                    `Age: ${Math.round(earlyAge + earlyCurrentYear)} | Saved: $${Math.round(earlyCurrentBalance).toLocaleString()} | Years: ${Math.round(earlyCurrentYear)}`;
-                
-                // Update late starter
-                const lateCurrentYear = progress * lateResult.years;
-                const lateCurrentBalance = (lateCurrentYear / lateResult.years) * Math.min(lateResult.finalBalance, currentGoal);
-                const lateProgressPercent = Math.min((lateCurrentBalance / currentGoal) * 100, 100);
-                
-                document.getElementById('lateProgress').style.width = lateProgressPercent + '%';
-                document.getElementById('lateStats').textContent = 
-                    `Age: ${Math.round(lateAge + lateCurrentYear)} | Saved: $${Math.round(lateCurrentBalance).toLocaleString()} | Years: ${Math.round(lateCurrentYear)}`;
-                
-                // Check for winner
-                if (progress >= 1) {
-                    clearInterval(raceInterval);
-                    raceInProgress = false;
-                    document.getElementById('startRace').disabled = false;
-                    
-                    // Determine and announce winner
-                    let winner, winnerText;
-                    if (earlyResult.reachedGoal === false && lateResult.reachedGoal === false) {
-                        winner = earlyResult.finalBalance > lateResult.finalBalance ? "early" : "late";
-                        winnerText = `Neither racer reached the goal of $${currentGoal.toLocaleString()}, but ${winner === "early" ? "The Early Bird" : "The Late Starter"} got closer!`;
-                    } else if (earlyResult.years < lateResult.years || (lateResult.reachedGoal === false && earlyResult.reachedGoal !== false)) {
-                        winner = "early";
-                        winnerText = `The Early Bird wins! Reached $${currentGoal.toLocaleString()} in ${earlyResult.years} years at age ${earlyResult.finalAge}.`;
-                    } else {
-                        winner = "late";
-                        winnerText = `The Late Starter wins! Reached $${currentGoal.toLocaleString()} in ${lateResult.years} years at age ${lateResult.finalAge}.`;
-                    }
-                    
-                    document.getElementById('winnerText').textContent = winnerText;
-                    document.getElementById('winnerAnnouncement').classList.add('show');
-                }
-            }, 50);
-        }
-        
-        // Reset race
-        function resetRace() {
-            if (raceInterval) {
-                clearInterval(raceInterval);
-            }
-            raceInProgress = false;
-            document.getElementById('startRace').disabled = false;
-            
-            // Reset progress bars
-            document.getElementById('earlyProgress').style.width = '0%';
-            document.getElementById('lateProgress').style.width = '0%';
-            
-            // Reset stats
-            const earlyAge = parseInt(document.getElementById('earlyAge').value);
-            const lateAge = parseInt(document.getElementById('lateAge').value);
-            
-            document.getElementById('earlyStats').textContent = `Age: ${earlyAge} | Saved: $0 | Years: 0`;
-            document.getElementById('lateStats').textContent = `Age: ${lateAge} | Saved: $0 | Years: 0`;
-            
-            // Hide winner announcement
-            document.getElementById('winnerAnnouncement').classList.remove('show');
-        }
-        
-        // Event listeners
-        document.getElementById('startRace').addEventListener('click', startRace);
-        document.getElementById('resetRace').addEventListener('click', resetRace);
-        
-        // Reset when inputs change
-        document.querySelectorAll('.control-input').forEach(input => {
-            input.addEventListener('input', resetRace);
-        });
-    </script>
-</body>
-</html>
+                // Apply tutorial settings
+                applyTutorialSettings(currentTutorial.settings);
