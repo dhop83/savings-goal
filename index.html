@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Goals Race Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+        
+        .goal-selector {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .goal-selector h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.8em;
+        }
+        
+        .goal-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .goal-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .goal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .goal-btn.active {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            transform: translateY(-2px);
+        }
+        
+        .custom-goal {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .custom-goal.active {
+            display: block;
+        }
+        
+        .custom-input {
+            padding: 12px;
+            font-size: 1.2em;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            margin: 0 10px;
+        }
+        
+        .racers-section {
+            padding: 30px;
+        }
+        
+        .racer {
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .racer:hover {
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        
+        .racer-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .racer-name {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        
+        .racer-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .control-group {
+            text-align: center;
+        }
+        
+        .control-group label {
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+        
+        .control-input {
+            padding: 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+            width: 80px;
+            font-weight: bold;
+        }
+        
+        .control-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .race-track {
+            padding: 30px;
+            background: #f8f9fa;
+            position: relative;
+        }
+        
+        .progress-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .racer-info {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .progress-stats {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .progress-bar {
+            height: 50px;
+            background: #e9ecef;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 25px;
+            transition: width 2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .progress-car {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(-50%) scale(1); }
+            100% { transform: translateY(-50%) scale(1.1); }
+        }
+        
+        .finish-line {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: repeating-linear-gradient(
+                0deg,
+                #000 0px,
+                #000 10px,
+                #fff 10px,
+                #fff 20px
+            );
+        }
+        
+        .controls-panel {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .race-btn {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .race-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .race-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .winner-announcement {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            margin: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: celebrate 2s infinite;
+        }
+        
+        .winner-announcement.show {
+            display: block;
+        }
+        
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .winner-announcement h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .insights {
+            background: #f8f9fa;
+            padding: 30px;
+            border-top: 3px solid #e9ecef;
+        }
+        
+        .insights h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        
+        .insight-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .insight-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .insight-card h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        @media (max-width: 768px) {
+            .racer-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .racer-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏁 Savings Goals Race Simulator</h1>
+            <p>Watch different saving strategies race to reach your financial goals!</p>
+        </div>
+        
+        <div class="goal-selector">
+            <h2>Choose Your Savings Goal</h2>
+            <div class="goal-buttons">
+                <button class="goal-btn active" data-goal="10000" data-name="Emergency Fund">
+                    🚨 Emergency Fund<br>$10,000
+                </button>
+                <button class="goal-btn" data-goal="25000" data-name="New Car">
+                    🚗 New Car<br>$25,000
+                </button>
+                <button class="goal-btn" data-goal="50000" data-name="House Down Payment">
+                    🏠 House Down Payment<br>$50,000
+                </button>
+                <button class="goal-btn" data-goal="100000" data-name="College Fund">
+                    🎓 College Fund<br>$100,000
+                </button>
+                <button class="goal-btn" data-goal="custom" data-name="Custom Goal">
+                    ⭐ Custom Goal<br>Set Your Own
+                </button>
+            </div>
+            
+            <div class="custom-goal" id="customGoal">
+                <label>Enter your custom goal amount:</label>
+                <input type="number" class="custom-input" id="customAmount" placeholder="50000" min="1000" max="1000000">
+            </div>
+        </div>
+        
+        <div class="racers-section">
+            <div class="racer">
+                <div class="racer-header">
+                    <div class="racer-name">🐢 The Early Bird</div>
+                    <div class="racer-controls">
+                        <div class="control-group">
+                            <label>Starting Age</label>
+                            <input type="number" class="control-input" id="earlyAge" value="18" min="16" max="30">
+                        </div>
+                        <div class="control-group">
+                            <label>Monthly Savings</label>
+                            <input type="number" class="control-input" id="earlyAmount" value="100" min="25" max="1000">
+                        </div>
+                        <div class="control-group">
+                            <label>Interest Rate %</label>
+                            <input type="number" class="control-input" id="earlyRate" value="7" min="1" max="15" step="0.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="race-track">
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <div class="racer-info">The Early Bird - Slow & Steady</div>
+                            <div class="progress-stats" id="earlyStats">Age: 18 | Saved: $0 | Years: 0</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="earlyProgress" style="width: 0%; background: linear-gradient(135deg, #4CAF50, #45a049);">
+                                <div class="progress-car">🐢</div>
+                            </div>
+                            <div class="finish-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="racer">
+                <div class="racer-header">
+                    <div class="racer-name">🐰 The Late Starter</div>
+                    <div class="racer-controls">
+                        <div class="control-group">
+                            <label>Starting Age</label>
+                            <input type="number" class="control-input" id="lateAge" value="30" min="25" max="50">
+                        </div>
+                        <div class="control-group">
+                            <label>Monthly Savings</label>
+                            <input type="number" class="control-input" id="lateAmount" value="300" min="50" max="2000">
+                        </div>
+                        <div class="control-group">
+                            <label>Interest Rate %</label>
+                            <input type="number" class="control-input" id="lateRate" value="7" min="1" max="15" step="0.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="race-track">
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <div class="racer-info">The Late Starter - Playing Catch Up</div>
+                            <div class="progress-stats" id="lateStats">Age: 30 | Saved: $0 | Years: 0</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="lateProgress" style="width: 0%; background: linear-gradient(135deg, #FF6B6B, #FF8E53);">
+                                <div class="progress-car">🐰</div>
+                            </div>
+                            <div class="finish-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <button class="race-btn" id="startRace">🏁 Start the Race!</button>
+            <button class="race-btn" id="resetRace">🔄 Reset Race</button>
+        </div>
+        
+        <div class="winner-announcement" id="winnerAnnouncement">
+            <h2>🎉 We have a winner! 🎉</h2>
+            <p id="winnerText"></p>
+        </div>
+        
+        <div class="insights">
+            <h3>💡 What We Learn From This Race</h3>
+            <div class="insight-cards">
+                <div class="insight-card">
+                    <h4>Time is Your Best Friend</h4>
+                    <p>Starting early, even with small amounts, often beats starting late with larger amounts. Compound interest needs time to work its magic!</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Consistency Wins</h4>
+                    <p>Regular monthly contributions, no matter how small, add up over time. The "slow and steady" approach often wins the race.</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Every Dollar Counts</h4>
+                    <p>Even increasing your monthly savings by $25-50 can dramatically change when you reach your goal. Small changes make big differences!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGoal = 10000;
+        let currentGoalName = "Emergency Fund";
+        let raceInProgress = false;
+        let raceInterval;
+        
+        // Goal selection
+        document.querySelectorAll('.goal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active button
+                document.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Handle custom goal
+                const customGoal = document.getElementById('customGoal');
+                if (btn.dataset.goal === 'custom') {
+                    customGoal.classList.add('active');
+                } else {
+                    customGoal.classList.remove('active');
+                    currentGoal = parseInt(btn.dataset.goal);
+                    currentGoalName = btn.dataset.name;
+                }
+                
+                resetRace();
+            });
+        });
+        
+        // Custom goal input
+        document.getElementById('customAmount').addEventListener('input', (e) => {
+            currentGoal = parseInt(e.target.value) || 50000;
+            currentGoalName = `Custom Goal ($${currentGoal.toLocaleString()})`;
+            resetRace();
+        });
+        
+        // Calculate savings growth
+        function calculateSavings(startAge, monthlyAmount, interestRate, maxYears = 50) {
+            const monthlyRate = interestRate / 100 / 12;
+            let balance = 0;
+            let months = 0;
+            
+            while (balance < currentGoal && months < maxYears * 12) {
+                balance = balance * (1 + monthlyRate) + monthlyAmount;
+                months++;
+                
+                if (balance >= currentGoal) {
+                    return {
+                        months: months,
+                        years: Math.round(months / 12 * 10) / 10,
+                        finalAge: startAge + Math.round(months / 12),
+                        finalBalance: Math.round(balance)
+                    };
+                }
+            }
+            
+            return {
+                months: months,
+                years: Math.round(months / 12 * 10) / 10,
+                finalAge: startAge + Math.round(months / 12),
+                finalBalance: Math.round(balance),
+                reachedGoal: false
+            };
+        }
+        
+        // Start race animation
+        function startRace() {
+            if (raceInProgress) return;
+            
+            raceInProgress = true;
+            document.getElementById('startRace').disabled = true;
+            document.getElementById('winnerAnnouncement').classList.remove('show');
+            
+            // Get values
+            const earlyAge = parseInt(document.getElementById('earlyAge').value);
+            const earlyAmount = parseInt(document.getElementById('earlyAmount').value);
+            const earlyRate = parseFloat(document.getElementById('earlyRate').value);
+            
+            const lateAge = parseInt(document.getElementById('lateAge').value);
+            const lateAmount = parseInt(document.getElementById('lateAmount').value);
+            const lateRate = parseFloat(document.getElementById('lateRate').value);
+            
+            // Calculate results
+            const earlyResult = calculateSavings(earlyAge, earlyAmount, earlyRate);
+            const lateResult = calculateSavings(lateAge, lateAmount, lateRate);
+            
+            // Determine winner and race duration
+            const maxTime = Math.max(earlyResult.years, lateResult.years) || 30;
+            const raceDuration = 5000; // 5 seconds for the race animation
+            
+            let startTime = Date.now();
+            
+            raceInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / raceDuration, 1);
+                
+                // Update early bird
+                const earlyCurrentYear = progress * earlyResult.years;
+                const earlyCurrentBalance = (earlyCurrentYear / earlyResult.years) * Math.min(earlyResult.finalBalance, currentGoal);
+                const earlyProgressPercent = Math.min((earlyCurrentBalance / currentGoal) * 100, 100);
+                
+                document.getElementById('earlyProgress').style.width = earlyProgressPercent + '%';
+                document.getElementById('earlyStats').textContent = 
+                    `Age: ${Math.round(earlyAge + earlyCurrentYear)} | Saved: $${Math.round(earlyCurrentBalance).toLocaleString()} | Years: ${Math.round(earlyCurrentYear)}`;
+                
+                // Update late starter
+                const lateCurrentYear = progress * lateResult.years;
+                const lateCurrentBalance = (lateCurrentYear / lateResult.years) * Math.min(lateResult.finalBalance, currentGoal);
+                const lateProgressPercent = Math.min((lateCurrentBalance / currentGoal) * 100, 100);
+                
+                document.getElementById('lateProgress').style.width = lateProgressPercent + '%';
+                document.getElementById('lateStats').textContent = 
+                    `Age: ${Math.round(lateAge + lateCurrentYear)} | Saved: $${Math.round(lateCurrentBalance).toLocaleString()} | Years: ${Math.round(lateCurrentYear)}`;
+                
+                // Check for winner
+                if (progress >= 1) {
+                    clearInterval(raceInterval);
+                    raceInProgress = false;
+                    document.getElementById('startRace').disabled = false;
+                    
+                    // Determine and announce winner
+                    let winner, winnerText;
+                    if (earlyResult.reachedGoal === false && lateResult.reachedGoal === false) {
+                        winner = earlyResult.finalBalance > lateResult.finalBalance ? "early" : "late";
+                        winnerText = `Neither racer reached the goal of $${currentGoal.toLocaleString()}, but ${winner === "early" ? "The Early Bird" : "The Late Starter"} got closer!`;
+                    } else if (earlyResult.years < lateResult.years || (lateResult.reachedGoal === false && earlyResult.reachedGoal !== false)) {
+                        winner = "early";
+                        winnerText = `The Early Bird wins! Reached $${currentGoal.toLocaleString()} in ${earlyResult.years} years at age ${earlyResult.finalAge}.`;
+                    } else {
+                        winner = "late";
+                        winnerText = `The Late Starter wins! Reached $${currentGoal.toLocaleString()} in ${lateResult.years} years at age ${lateResult.finalAge}.`;
+                    }
+                    
+                    document.getElementById('winnerText').textContent = winnerText;
+                    document.getElementById('winnerAnnouncement').classList.add('show');
+                }
+            }, 50);
+        }
+        
+        // Reset race
+        function resetRace() {
+            if (raceInterval) {
+                clearInterval(raceInterval);
+            }
+            raceInProgress = false;
+            document.getElementById('startRace').disabled = false;
+            
+            // Reset progress bars
+            document.getElementById('earlyProgress').style.width = '0%';
+            document.getElementById('lateProgress').style.width = '0%';
+            
+            // Reset stats
+            const earlyAge = parseInt(document.getElementById('earlyAge').value);
+            const lateAge = parseInt(document.getElementById('lateAge').value);
+            
+            document.getElementById('earlyStats').textContent = `Age: ${earlyAge} | Saved: $0 | Years: 0`;
+            document.getElementById('lateStats').textContent = `Age: ${lateAge} | Saved: $0 | Years: 0`;
+            
+            // Hide winner announcement
+            document.getElementById('winnerAnnouncement').classList.remove('show');
+        }
+        
+        // Event listeners
+        document.getElementById('startRace').addEventListener('click', startRace);
+        document.getElementById('resetRace').addEventListener('click', resetRace);
+        
+        // Reset when inputs change
+        document.querySelectorAll('.control-input').forEach(input => {
+            input.addEventListener('input', resetRace);
+        });
+    </script>
+</body>
+</html>
