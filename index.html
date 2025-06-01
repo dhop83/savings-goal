@@ -1,133 +1,312 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Savings Goals Race Simulator</title>
-    <style>
-        /* ... [Your CSS from paste.txt goes here, unchanged] ... */
-        /* For brevity, copy all your CSS here from the provided file */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Savings Goals Race Simulator</title>
+  <style>
+    body {
+      background: #f8f9fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+      padding: 36px 32px 32px 32px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .header h1 {
+      font-size: 2.1em;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .header p {
+      color: #666;
+      font-size: 1.15em;
+      margin: 0;
+    }
+    .tutorial-mode {
+      background: #e9f5ff;
+      border-radius: 8px;
+      padding: 20px 18px 16px 18px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .tutorial-mode h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.13em;
+      color: #1766a6;
+    }
+    .tutorial-controls {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tutorial-btn {
+      background: #f0f6fb;
+      border: 1.5px solid #b5d6f6;
+      color: #1766a6;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, border 0.2s, color 0.2s;
+    }
+    .tutorial-btn.active,
+    .tutorial-btn:hover {
+      background: #1766a6;
+      color: #fff;
+      border-color: #1766a6;
+    }
+    .tutorial-explanation {
+      margin: 12px 0 24px 0;
+      background: #f6fafd;
+      border-left: 4px solid #b5d6f6;
+      padding: 12px 15px;
+      border-radius: 0 6px 6px 0;
+      color: #2d5e89;
+      font-size: 1.05em;
+      min-height: 32px;
+    }
+    .goal-selector {
+      margin-bottom: 22px;
+    }
+    .goal-selector h2 {
+      font-size: 1.18em;
+      margin-bottom: 10px;
+      color: #2b3f5c;
+    }
+    .goal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .goal-btn {
+      background: #f5f5f5;
+      border: 1.5px solid #c6c6c6;
+      color: #3a3a3a;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, border 0.2s, color 0.2s;
+    }
+    .goal-btn.active,
+    .goal-btn:hover {
+      background: #1766a6;
+      color: #fff;
+      border-color: #1766a6;
+    }
+    .custom-goal {
+      display: none;
+      margin-top: 8px;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-goal.active {
+      display: flex;
+    }
+    .custom-input {
+      width: 120px;
+      padding: 6px 8px;
+      font-size: 1em;
+      border: 1.5px solid #b5d6f6;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    .controls-panel {
+      margin: 28px 0 18px 0;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .race-btn {
+      background: #1766a6;
+      color: #fff;
+      border: none;
+      padding: 10px 26px;
+      border-radius: 7px;
+      font-size: 1.08em;
+      cursor: pointer;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(23,102,166,0.09);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .race-btn:hover {
+      background: #0d426e;
+      box-shadow: 0 4px 16px rgba(23,102,166,0.13);
+    }
+    .live-commentary {
+      background: #f8f6ed;
+      border-left: 4px solid #ffe48c;
+      padding: 12px 15px;
+      border-radius: 0 6px 6px 0;
+      color: #8d7b2b;
+      font-size: 1.08em;
+      min-height: 32px;
+      margin-bottom: 18px;
+    }
+    .winner-announcement {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      background: #e7ffe7;
+      border-radius: 8px;
+      padding: 18px 0;
+      border: 2px solid #7be47b;
+      color: #187a18;
+      font-size: 1.35em;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+    }
+    .winner-announcement.show {
+      display: block;
+      animation: winnerPop 0.6s;
+    }
+    @keyframes winnerPop {
+      0% { transform: scale(0.7); opacity: 0; }
+      60% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 16px 4vw 18px 4vw;
+      }
+      .controls-panel {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .tutorial-controls, .goal-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏁 Enhanced Savings Goals Race Simulator</h1>
-            <p>Watch different saving strategies race to reach your financial goals!</p>
-        </div>
-        
-        <div class="tutorial-mode">
-            <h3>🎓 Learning Mode</h3>
-            <p>Choose a guided tutorial to learn key savings concepts:</p>
-            <div class="tutorial-controls">
-                <button class="tutorial-btn" data-tutorial="basic">Basic Race</button>
-                <button class="tutorial-btn" data-tutorial="early-wins">Why Early Wins</button>
-                <button class="tutorial-btn" data-tutorial="interest-power">Interest Rate Power</button>
-                <button class="tutorial-btn" data-tutorial="catch-up">Can Late Starter Win?</button>
-            </div>
-        </div>
-        
-        <div class="tutorial-explanation" id="tutorialExplanation">
-            Click a tutorial above to get started, or scroll down to create your own race scenarios!
-        </div>
-        
-        <div class="goal-selector">
-            <h2>Choose Your Savings Goal</h2>
-            <div class="goal-buttons">
-                <button class="goal-btn" data-goal="1000">Save $1,000</button>
-                <button class="goal-btn" data-goal="5000">Save $5,000</button>
-                <button class="goal-btn" data-goal="10000">Save $10,000</button>
-                <button class="goal-btn" data-goal="custom">Custom Goal</button>
-            </div>
-            <div class="custom-goal" id="customGoalInput">
-                <label for="customGoalAmount">Enter your goal amount: $</label>
-                <input type="number" id="customGoalAmount" class="custom-input" min="1" step="1" />
-                <button id="setCustomGoal" class="goal-btn">Set Goal</button>
-            </div>
-        </div>
-        
-        <div class="controls-panel">
-            <button class="race-btn" id="startRace">Start Race</button>
-            <button class="race-btn" id="resetRace">Reset Race</button>
-        </div>
-        
-        <div class="live-commentary" id="liveCommentary">
-            Ready to race! Adjust your racers and start the simulation.
-        </div>
-        
-        <div class="winner-announcement" id="winnerAnnouncement">
-            <h2 id="winnerText"></h2>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>🏁 Enhanced Savings Goals Race Simulator</h1>
+      <p>Watch different saving strategies race to reach your financial goals!</p>
     </div>
-    <script>
-        // Tutorial button logic
-        const tutorialBtns = document.querySelectorAll('.tutorial-btn');
-        const tutorialExplanation = document.getElementById('tutorialExplanation');
-        const tutorialTexts = {
-            basic: "This is the basic race: see how steady savings can reach a goal over time.",
-            "early-wins": "Learn why starting early gives you a huge advantage in reaching your savings goals.",
-            "interest-power": "See how a higher interest rate can supercharge your savings growth.",
-            "catch-up": "Can someone who starts late but saves more catch up? Let's find out!"
-        };
-        tutorialBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                tutorialBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                const key = this.dataset.tutorial;
-                tutorialExplanation.textContent = tutorialTexts[key] || "Click a tutorial above to get started, or scroll down to create your own race scenarios!";
-            });
-        });
+    <div class="tutorial-mode">
+      <h3>🎓 Learning Mode</h3>
+      <p>Choose a guided tutorial to learn key savings concepts:</p>
+      <div class="tutorial-controls">
+        <button class="tutorial-btn" data-tutorial="basic">Basic Race</button>
+        <button class="tutorial-btn" data-tutorial="early-wins">Why Early Wins</button>
+        <button class="tutorial-btn" data-tutorial="interest-power">Interest Rate Power</button>
+        <button class="tutorial-btn" data-tutorial="catch-up">Can Late Starter Win?</button>
+      </div>
+    </div>
+    <div class="tutorial-explanation" id="tutorialExplanation">
+      Click a tutorial above to get started, or scroll down to create your own race scenarios!
+    </div>
+    <div class="goal-selector">
+      <h2>Choose Your Savings Goal</h2>
+      <div class="goal-buttons">
+        <button class="goal-btn" data-goal="1000">$1,000</button>
+        <button class="goal-btn" data-goal="5000">$5,000</button>
+        <button class="goal-btn" data-goal="10000">$10,000</button>
+        <button class="goal-btn" data-goal="custom">Custom Goal</button>
+      </div>
+      <div class="custom-goal" id="customGoalInput">
+        <label for="customGoalAmount">Enter your goal amount: $</label>
+        <input type="number" id="customGoalAmount" class="custom-input" min="1" step="1" />
+        <button id="setCustomGoal" class="goal-btn">Set Goal</button>
+      </div>
+    </div>
+    <div class="controls-panel">
+      <button class="race-btn" id="startRace">Start Race</button>
+      <button class="race-btn" id="resetRace">Reset Race</button>
+    </div>
+    <div class="live-commentary" id="liveCommentary">
+      Ready to race! Adjust your racers and start the simulation.
+    </div>
+    <div class="winner-announcement" id="winnerAnnouncement">
+      <h2 id="winnerText"></h2>
+    </div>
+  </div>
+  <script>
+    // Tutorial button logic
+    const tutorialBtns = document.querySelectorAll('.tutorial-btn');
+    const tutorialExplanation = document.getElementById('tutorialExplanation');
+    const tutorialTexts = {
+      basic: "This is the basic race: see how steady savings can reach a goal over time.",
+      "early-wins": "Learn why starting early gives you a huge advantage in reaching your savings goals.",
+      "interest-power": "See how a higher interest rate can supercharge your savings growth.",
+      "catch-up": "Can someone who starts late but saves more catch up? Let's find out!"
+    };
+    tutorialBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        tutorialBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const key = this.dataset.tutorial;
+        tutorialExplanation.textContent = tutorialTexts[key] || "Click a tutorial above to get started, or scroll down to create your own race scenarios!";
+      });
+    });
 
-        // Goal selection logic
-        const goalBtns = document.querySelectorAll('.goal-btn');
-        const customGoalInput = document.getElementById('customGoalInput');
-        let selectedGoal = 1000; // Default
-        goalBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                goalBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                if (this.dataset.goal === 'custom') {
-                    customGoalInput.classList.add('active');
-                } else {
-                    customGoalInput.classList.remove('active');
-                    selectedGoal = parseInt(this.dataset.goal);
-                    document.getElementById('liveCommentary').textContent = `Goal set: $${selectedGoal.toLocaleString()}`;
-                }
-            });
-        });
-        document.getElementById('setCustomGoal').addEventListener('click', function() {
-            const amount = parseInt(document.getElementById('customGoalAmount').value);
-            if (amount && amount > 0) {
-                selectedGoal = amount;
-                document.getElementById('liveCommentary').textContent = `Custom goal set: $${selectedGoal.toLocaleString()}`;
-            } else {
-                alert('Please enter a valid goal amount.');
-            }
-        });
+    // Goal selection logic
+    const goalBtns = document.querySelectorAll('.goal-btn');
+    const customGoalInput = document.getElementById('customGoalInput');
+    let selectedGoal = 1000; // Default
+    goalBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        goalBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        if (this.dataset.goal === 'custom') {
+          customGoalInput.classList.add('active');
+        } else {
+          customGoalInput.classList.remove('active');
+          selectedGoal = parseInt(this.dataset.goal);
+          document.getElementById('liveCommentary').textContent = `Goal set: $${selectedGoal.toLocaleString()}`;
+        }
+      });
+    });
+    document.getElementById('setCustomGoal').addEventListener('click', function() {
+      const amount = parseInt(document.getElementById('customGoalAmount').value);
+      if (amount && amount > 0) {
+        selectedGoal = amount;
+        document.getElementById('liveCommentary').textContent = `Custom goal set: $${selectedGoal.toLocaleString()}`;
+      } else {
+        alert('Please enter a valid goal amount.');
+      }
+    });
 
-        // Race control logic (example)
-        const startRaceBtn = document.getElementById('startRace');
-        const resetRaceBtn = document.getElementById('resetRace');
-        const liveCommentary = document.getElementById('liveCommentary');
-        const winnerAnnouncement = document.getElementById('winnerAnnouncement');
-        const winnerText = document.getElementById('winnerText');
+    // Race control logic (example)
+    const startRaceBtn = document.getElementById('startRace');
+    const resetRaceBtn = document.getElementById('resetRace');
+    const liveCommentary = document.getElementById('liveCommentary');
+    const winnerAnnouncement = document.getElementById('winnerAnnouncement');
+    const winnerText = document.getElementById('winnerText');
 
-        startRaceBtn.addEventListener('click', function() {
-            liveCommentary.textContent = "🏁 The race is on! Simulating savings growth...";
-            winnerAnnouncement.classList.remove('show');
-            // Simulate a winner after 2 seconds (demo only)
-            setTimeout(() => {
-                winnerText.textContent = "🎉 Racer 1 wins!";
-                winnerAnnouncement.classList.add('show');
-                liveCommentary.textContent = "Race finished!";
-            }, 2000);
-        });
+    startRaceBtn.addEventListener('click', function() {
+      liveCommentary.textContent = "🏁 The race is on! Simulating savings growth...";
+      winnerAnnouncement.classList.remove('show');
+      // Simulate a winner after 2 seconds (demo only)
+      setTimeout(() => {
+        winnerText.textContent = "🎉 Racer 1 wins!";
+        winnerAnnouncement.classList.add('show');
+        liveCommentary.textContent = "Race finished!";
+      }, 2000);
+    });
 
-        resetRaceBtn.addEventListener('click', function() {
-            liveCommentary.textContent = "Ready to race! Adjust your racers and start the simulation.";
-            winnerAnnouncement.classList.remove('show');
-            winnerText.textContent = "";
-        });
-    </script>
+    resetRaceBtn.addEventListener('click', function() {
+      liveCommentary.textContent = "Ready to race! Adjust your racers and start the simulation.";
+      winnerAnnouncement.classList.remove('show');
+      winnerText.textContent = "";
+    });
+  </script>
 </body>
 </html>
